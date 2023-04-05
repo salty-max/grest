@@ -4,11 +4,12 @@ import (
 	"os"
 	"time"
 
-	log "github.com/charmbracelet/log"
+	"github.com/charmbracelet/log"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/salty-max/grest/config"
+	"github.com/salty-max/grest/internal/storage"
 	"github.com/salty-max/grest/pkg/shutdown"
 )
 
@@ -67,6 +68,14 @@ func run(env config.EnvVars) (func(), error) {
 }
 
 func buildServer(env config.EnvVars) (*fiber.App, func(), error) {
+	log.Info("connecting to database...")
+	// init the storage
+	db, err := storage.Connect(env)
+	if err != nil {
+		return nil, nil, err
+	}
+	log.Info("successfully connected to database!")
+
 	// create the fiber app
 	app := fiber.New()
 
@@ -85,6 +94,6 @@ func buildServer(env config.EnvVars) (*fiber.App, func(), error) {
 	})
 
 	return app, func() {
-		log.Info("gracefully shutting down...")
+		storage.Close(db)
 	}, nil
 }

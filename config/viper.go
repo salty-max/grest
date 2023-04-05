@@ -7,14 +7,24 @@ import (
 )
 
 type EnvVars struct {
-	PORT string `mapstructure:"PORT"`
+	DB_HOST     string `mapstructure:"DB_HOST"`
+	DB_PORT     string `mapstructure:"DB_PORT"`
+	DB_NAME     string `mapstructure:"DB_NAME"`
+	DB_USER     string `mapstructure:"DB_USER"`
+	DB_PASSWORD string `mapstructure:"DB_PASSWORD"`
+	PORT        string `mapstructure:"PORT"`
 }
 
 func LoadConfig() (config EnvVars, err error) {
 	env := os.Getenv("GO_ENV")
 	if env == "production" {
 		return EnvVars{
-			PORT: os.Getenv("PORT"),
+			DB_HOST:     os.Getenv("DB_HOST"),
+			DB_PORT:     os.Getenv("DB_PORT"),
+			DB_NAME:     os.Getenv("DB_NAME"),
+			DB_USER:     os.Getenv("DB_USER"),
+			DB_PASSWORD: os.Getenv("DB_PASSWORD"),
+			PORT:        os.Getenv("PORT"),
 		}, nil
 	}
 

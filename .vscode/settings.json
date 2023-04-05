@@ -2,9 +2,12 @@
   "cSpell.words": [
     "charmbracelet",
     "cmds",
+    "dbname",
     "gofiber",
+    "gorm",
     "grest",
     "kree",
-    "mapstructure"
+    "mapstructure",
+    "sslmode"
   ]
 }

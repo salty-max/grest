@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  db:
+    container_name: "grest-db"
+    image: postgres:latest
+    ports:
+      - 1234:5432
+    environment:
+      - POSTGRES_DB=grest-db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - grest
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  
+  web:
+    container_name: "grest-app"
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file:
+      - app.env
+    ports:
+      - "1664:1664"
+    depends_on:
+      - db
+    volumes:
+      - ./:/app
+    networks:
+      - grest
+
+volumes:
+  db_data:
+
+networks:
+  grest:
+    driver: bridge

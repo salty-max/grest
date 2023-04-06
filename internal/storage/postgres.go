@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/salty-max/grest/config"
+	"github.com/salty-max/grest/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -27,7 +28,12 @@ func Connect(env config.EnvVars) (*Database, error) {
 		return nil, err
 	}
 
-	DB.AutoMigrate()
+	err = DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";").Error
+	if err != nil {
+		return nil, err
+	}
+
+	DB.AutoMigrate(&models.Jot{})
 
 	return &Database{
 		Client: DB,

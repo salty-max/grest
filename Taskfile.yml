@@ -5,6 +5,10 @@ tasks:
     cmds:
       - docker-compose up --build
 
+  dev:local:
+    cmds:
+      - air
+
   build:
     cmds:
       - go build -o http-server cmd/http/main.go

@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/salty-max/grest/config"
+	"github.com/salty-max/grest/internal/jot"
 	"github.com/salty-max/grest/internal/storage"
 	"github.com/salty-max/grest/pkg/shutdown"
 )
@@ -92,6 +93,10 @@ func buildServer(env config.EnvVars) (*fiber.App, func(), error) {
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.SendString("Healthy!")
 	})
+
+	jotStore := jot.NewJotStorage(db)
+	jotController := jot.NewJotController(jotStore)
+	jot.AddJotRoutes(app, *jotController)
 
 	return app, func() {
 		storage.Close(db)

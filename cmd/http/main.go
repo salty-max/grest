@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -9,7 +10,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/salty-max/grest/config"
-	"github.com/salty-max/grest/internal/jot"
+	mw "github.com/salty-max/grest/internal/middlewares"
+	"github.com/salty-max/grest/internal/routes"
 	"github.com/salty-max/grest/internal/storage"
 	"github.com/salty-max/grest/pkg/shutdown"
 )
@@ -83,20 +85,15 @@ func buildServer(env config.EnvVars) (*fiber.App, func(), error) {
 	// add middleware
 	app.Use(cors.New())
 	app.Use(logger.New())
+	app.Use(mw.JSONMiddleWare)
 
-	// add root route
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Jaffa, kree!")
-	})
+	timeout_delay, err := strconv.ParseInt(os.Getenv("TIMEOUT_DELAY"), 10, 64)
+	if err != nil {
+		log.Error(err)
+	}
+	app.Use(mw.TimeoutMiddleware(time.Duration(timeout_delay) * time.Second))
 
-	// add health check
-	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.SendString("Healthy!")
-	})
-
-	jotStore := jot.NewJotStorage(db)
-	jotController := jot.NewJotController(jotStore)
-	jot.AddJotRoutes(app, *jotController)
+	routes.SetupRoutes(app, db)
 
 	return app, func() {
 		storage.Close(db)

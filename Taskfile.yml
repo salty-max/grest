@@ -13,6 +13,10 @@ tasks:
     cmds:
       - go build -o http-server cmd/http/main.go
 
+  test:
+    cmds:
+      - go test ./...
+
   start:
     cmds:
       - ./http-server

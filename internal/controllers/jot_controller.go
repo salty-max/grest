@@ -1,13 +1,14 @@
-package jot
+package controllers
 
 import (
 	"github.com/charmbracelet/log"
 	"github.com/gofiber/fiber/v2"
 	"github.com/salty-max/grest/internal/models"
+	"github.com/salty-max/grest/internal/storage"
 )
 
 type JotController struct {
-	Store *JotStorage
+	Repo *storage.JotRepository
 }
 
 type CreateJotDTO struct {
@@ -16,14 +17,14 @@ type CreateJotDTO struct {
 	Author string `json:"author"`
 }
 
-func NewJotController(store *JotStorage) *JotController {
+func NewJotController(repo *storage.JotRepository) *JotController {
 	return &JotController{
-		Store: store,
+		Repo: repo,
 	}
 }
 
 func (j *JotController) GetAll(c *fiber.Ctx) error {
-	jots, err := j.Store.GetJots(c.Context())
+	jots, err := j.Repo.GetJots(c.Context())
 	if err != nil {
 		log.Error(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -45,7 +46,7 @@ func (j *JotController) Create(c *fiber.Ctx) error {
 	}
 
 	// create the jot
-	newJot, err := j.Store.CreateJot(c.Context(), *jot)
+	newJot, err := j.Repo.CreateJot(c.Context(), *jot)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
